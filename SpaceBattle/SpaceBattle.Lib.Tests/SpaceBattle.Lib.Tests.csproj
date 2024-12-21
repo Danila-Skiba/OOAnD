@@ -17,5 +17,12 @@
       <PrivateAssets>all</PrivateAssets>
     </PackageReference>
     <ProjectReference Include="..\SpaceBattle.Lib\SpaceBattle.Lib.csproj" />
+
+    <Reference Include="core">
+      <HintPath>..\Common\core.dll</HintPath>
+    </Reference>
+    <Reference Include="scopes">
+      <HintPath>..\Common\scopes.dll</HintPath>
+    </Reference>
   </ItemGroup>
 </Project>
