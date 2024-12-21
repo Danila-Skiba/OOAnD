@@ -1,0 +1,36 @@
+name: CI
+
+on:
+  pull_request:
+    branches: ["main"]
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v2
+        with:
+          dotnet-version: 8.0.x
+
+      - name: Restore dependencies
+        run: dotnet restore SpaceBattle/SpaceBattle.Lib.Tests
+
+      - name: Install Required Tools
+        run: |
+          dotnet new tool-manifest
+          dotnet tool install dotnet-coverage
+          dotnet tool install coverlet.console
+
+      - name: Build
+        run: dotnet build SpaceBattle/SpaceBattle.Lib --no-restore /p:ContinuousIntegrationBuild=true
+
+      - name: Test
+        run: cd SpaceBattle/SpaceBattle.Lib.Tests/ &&  dotnet test /p:CollectCoverage=true /p:CoverletOutputFormat=cobertura
+
+      - name: Coverage and Tests
+        run: |
+          cd SpaceBattle/SpaceBattle.Lib.Tests/
+          dotnet coverlet bin/Debug/net8.0/SpaceBattle.Lib.Tests.dll --target "dotnet" --targetargs "test --no-build" -f=opencover -o="coverage.xml"
