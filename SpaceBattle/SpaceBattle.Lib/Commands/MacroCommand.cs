@@ -1,7 +1,4 @@
-﻿using App;
-using System.Linq;
-
-namespace SpaceBattle.Lib.Commands
+﻿namespace SpaceBattle.Lib.Commands
 {
     public class MacroCommand : ICommand
     {
