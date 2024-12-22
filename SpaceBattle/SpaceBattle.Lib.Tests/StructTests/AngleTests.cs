@@ -1,4 +1,4 @@
-namespace SpaceBattle.Lib.Tests;
+﻿namespace SpaceBattle.Lib.Tests;
 
 public class TestsAngle
 {
@@ -49,8 +49,6 @@ public class TestsAngle
     {
         var angle = new Angle(5);
         var hashcode = angle.GetHashCode();
-
-        Assert.NotNull(hashcode);
     }
     [Fact]
     public void Angle_Equals_Null_ReturnsFalse()
@@ -63,7 +61,7 @@ public class TestsAngle
     {
         var angle = new Angle(0);
 
-        double Sin_Angle = Math.Sin(angle);
+        var Sin_Angle = Math.Sin(angle);
 
         Assert.Equal(0.0, Sin_Angle);
     }
@@ -72,7 +70,7 @@ public class TestsAngle
     {
         var angle = new Angle(0);
 
-        double Cos_Angle = Math.Cos(angle);
+        var Cos_Angle = Math.Cos(angle);
 
         Assert.Equal(1.0, Cos_Angle);
     }
