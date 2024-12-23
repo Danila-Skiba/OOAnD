@@ -4,7 +4,7 @@ using SpaceBattle.Lib.Commands;
 
 namespace SpaceBattle.Lib.Tests.CommandTests
 {
-    public class RegisterIoCDependencyMacroCommandTests
+    public class RegisterIoCDependencyMacroCommandTests : IDisposable
     {
         public RegisterIoCDependencyMacroCommandTests()
         {
@@ -90,6 +90,11 @@ namespace SpaceBattle.Lib.Tests.CommandTests
                 Ioc.Resolve<ICommand>("Commands.Macro", args)
             );
             Assert.Equal("Invalid arguments for Commands.Macro", exception.Message);
+        }
+
+        public void Dispose()
+        {
+            Ioc.Resolve<App.ICommand>("IoC.Scope.Current.Clear").Execute();
         }
     }
 }
