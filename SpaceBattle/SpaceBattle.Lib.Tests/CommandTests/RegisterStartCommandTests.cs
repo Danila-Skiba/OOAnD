@@ -42,6 +42,7 @@ namespace SpaceBattle.Lib.Tests
         [Fact]
         public void Test_RegisterIoCDependencyActionsStart_DependencyNotResolved()
         {
+
             var commandMock = new Mock<ICommand>();
             var receiverMock = new Mock<ICommandReceiver>();
             var gameObject = new Dictionary<string, object>();
