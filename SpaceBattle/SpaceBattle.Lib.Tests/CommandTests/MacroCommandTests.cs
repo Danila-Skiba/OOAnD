@@ -4,7 +4,7 @@ using SpaceBattle.Lib.Commands;
 
 namespace SpaceBattle.Lib.Tests.CommandTests
 {
-    public class MacroCommandTests : IDisposable
+    public class MacroCommandTests
     {
         [Fact]
         public void Execute_AllCommandsExecuted()
@@ -43,10 +43,6 @@ namespace SpaceBattle.Lib.Tests.CommandTests
             var macro = new MacroCommand(Array.Empty<ICommand>());
             var exception = Record.Exception(() => macro.Execute());
             Assert.Null(exception);
-        }
-        public void Dispose()
-        {
-            Ioc.Resolve<App.ICommand>("IoC.Scope.Current.Clear").Execute();
         }
     }
 }
