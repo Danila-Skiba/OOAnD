@@ -1,4 +1,4 @@
-using App;
+﻿using App;
 using App.Scopes;
 using Moq;
 
@@ -64,7 +64,6 @@ namespace SpaceBattle.Lib.Tests
 
             var startCommand = new StartCommand(command.Object, receiver.Object, gameObject.Object, cmdName);
 
-
             Assert.Throws<Exception>(() => startCommand.Execute());
             gameObject.VerifySet(obj => obj[cmdName] = command.Object, Times.Once);
             receiver.Verify(r => r.Receive(It.IsAny<ICommand>()), Times.Never);
@@ -78,9 +77,7 @@ namespace SpaceBattle.Lib.Tests
             var gameObject = new Mock<IDictionary<string, object>>();
             var cmdName = "TestCommand";
 
-
             receiver.Setup(r => r.Receive(It.IsAny<ICommand>())).Throws<Exception>();
-
 
             var startCommand = new StartCommand(command.Object, receiver.Object, gameObject.Object, cmdName);
             startCommand.Execute();
