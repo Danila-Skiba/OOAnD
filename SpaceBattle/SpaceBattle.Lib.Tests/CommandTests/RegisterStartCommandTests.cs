@@ -22,43 +22,45 @@ namespace SpaceBattle.Lib.Tests
 
             var injectableCommandMock = new Mock<ICommand>();
             var receiverMock = new Mock<ICommandReceiver>();
-            var gameObject = new Dictionary<string, object>();
+            var gameObject = new Mock<IDictionary<string, object>>();
+            var cmdName = "TestCommand";
             var order = new Dictionary<string, object>
             {
                 {"Cmd", injectableCommandMock.Object},
                 {"Receiver", receiverMock.Object},
-                {"Name", "TestCommand"},
-                {"Object", gameObject}
+                {"Name", cmdName},
+                {"Object", gameObject.Object}
             };
 
             var startCommand = Ioc.Resolve<ICommand>("Actions.Start", order);
             startCommand.Execute();
 
             Assert.IsType<StartCommand>(startCommand);
-            Assert.True(gameObject.ContainsKey("TestCommand"));
-            receiverMock.Verify(r => r.Receive(It.IsAny<ICommand>()), Times.Once);
+            gameObject.VerifySet(obj => obj[cmdName] = injectableCommandMock.Object, Times.Once);
+            receiverMock.Verify(r => r.Receive(injectableCommandMock.Object), Times.Once);
         }
 
         [Fact]
         public void Test_RegisterIoCDependencyActionsStart_DependencyNotResolved()
         {
+            var command = new Mock<ICommand>();
+            var receiver = new Mock<ICommandReceiver>();
+            var gameObject = new Mock<IDictionary<string, object>>();
+            var cmdName = "TestCommand";
 
-            var commandMock = new Mock<ICommand>();
-            var receiverMock = new Mock<ICommandReceiver>();
-            var gameObject = new Dictionary<string, object>();
             var order = new Dictionary<string, object>
             {
-                { "Cmd", commandMock.Object },
-                { "Receiver", receiverMock.Object },
-                { "Name", "TestCommand" },
-                { "Object", gameObject }
+                { "Cmd", command.Object },
+                { "Receiver", receiver.Object },
+                { "Name", cmdName },
+                { "Object", gameObject.Object }
             };
 
             var registerCommand = new RegisterIocDependencyActionsStart();
 
             Assert.Throws<Exception>(() => Ioc.Resolve<ICommand>("Actions.Start", order));
-            Assert.False(gameObject.ContainsKey("TestCommand"));
-            receiverMock.Verify(r => r.Receive(It.IsAny<ICommand>()), Times.Never);
+            gameObject.VerifySet(obj => obj[cmdName] = command.Object, Times.Never);
+            receiver.Verify(r => r.Receive(command.Object), Times.Never);
         }
 
         public void Dispose()
