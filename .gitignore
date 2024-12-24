@@ -219,7 +219,7 @@ ClientBin/
 *~
 *.dbmdl
 *.xml
-.config
+.config/
 *.dbproj.schemaview
 *.jfm
 *.pfx
