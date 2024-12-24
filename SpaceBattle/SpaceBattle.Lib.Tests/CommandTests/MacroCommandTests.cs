@@ -1,5 +1,4 @@
-﻿using App;
-using Moq;
+﻿using Moq;
 using SpaceBattle.Lib.Commands;
 
 namespace SpaceBattle.Lib.Tests.CommandTests
