@@ -35,10 +35,12 @@ namespace SpaceBattle.Lib.Tests
             Ioc.Resolve<App.ICommand>("IoC.Register", "Commands.CommandInjectable", (object[] args) => injectableMock.Object).Execute();
 
             var injectableCmd = Ioc.Resolve<ICommand>("Commands.CommandInjectable");
-            if (injectableCmd is ICommandInjectable injectable)
-            {
-                injectable.Inject(command.Object);
-            }
+
+            injectableMock.Object.Inject(command.Object);
+            /* if (injectableCmd is ICommandInjectable injectable)
+             {
+                 injectable.Inject(command.Object);
+             }*/
 
             var receiver = new Mock<ICommandReceiver>();
             var gameObject = new Mock<IDictionary<string, object>>();
