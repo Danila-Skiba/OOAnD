@@ -3,7 +3,7 @@ using App.Scopes;
 
 namespace SpaceBattle.Lib.Tests
 {
-    public class RegisterIoCDependencyEmptyCommandTests: IDisposable
+    public class RegisterIoCDependencyEmptyCommandTests : IDisposable
     {
         public RegisterIoCDependencyEmptyCommandTests()
         {
@@ -22,6 +22,5 @@ namespace SpaceBattle.Lib.Tests
         {
             Ioc.Resolve<App.ICommand>("IoC.Scope.Current.Clear").Execute();
         }
-        
     }
 }

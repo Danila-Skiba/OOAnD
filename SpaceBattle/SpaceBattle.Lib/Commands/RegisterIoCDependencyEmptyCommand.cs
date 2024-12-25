@@ -11,7 +11,7 @@ namespace SpaceBattle.Lib
                 "IoC.Register",
                 "Commands.Empty",
                 (object[] args) => emptyCommand
-            ).Execute(); 
-        } 
+            ).Execute();
+        }
     }
 }

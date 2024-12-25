@@ -1,12 +1,11 @@
 ﻿using App;
-using App.Scopes;
 using Moq;
 
 namespace SpaceBattle.Lib.Tests
 {
     public class StopCommandTest
     {
-        
+
         [Fact]
         public void ShouldInjectEmptyCommand()
         {
@@ -19,7 +18,5 @@ namespace SpaceBattle.Lib.Tests
             new StopCommand("testObjId", "testCmdName").Execute();
             mockInjectable.Verify(i => i.Inject(mockEmptyCommand.Object), Times.Once);
         }
-
-        
     }
 }

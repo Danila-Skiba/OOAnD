@@ -2,7 +2,7 @@
 
 namespace SpaceBattle.Lib
 {
-    public class RegisterIoCDependencyActionsStop :ICommand
+    public class RegisterIoCDependencyActionsStop : ICommand
     {
         public void Execute()
         {

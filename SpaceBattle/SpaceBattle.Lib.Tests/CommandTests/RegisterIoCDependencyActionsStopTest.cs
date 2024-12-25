@@ -3,7 +3,7 @@ using App.Scopes;
 
 namespace SpaceBattle.Lib.Tests
 {
-    public class RegisterIoCDependencyActionsStopTests: IDisposable
+    public class RegisterIoCDependencyActionsStopTests : IDisposable
     {
         public RegisterIoCDependencyActionsStopTests()
         {

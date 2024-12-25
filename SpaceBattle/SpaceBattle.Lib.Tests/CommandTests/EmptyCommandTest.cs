@@ -7,7 +7,7 @@ namespace SpaceBattle.Lib.Tests
         [Fact]
         public void ShouldNotChangeState()
         {
-            new EmptyCommand().Execute(); 
+            new EmptyCommand().Execute();
         }
     }
 }
