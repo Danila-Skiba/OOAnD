@@ -31,8 +31,8 @@ namespace SpaceBattle.Lib.Tests
         public void Execute_AddInjectableCommandToGameObjAndSendToReceiver()
         {
             var command = new Mock<ICommand>();
-            var registerCmd = new RegisterDependencyCommandInjectableCommand();
-            registerCmd.Execute();
+            var injectableMock = new Mock<ICommand>().As<ICommandInjectable>();
+            Ioc.Resolve<App.ICommand>("IoC.Register", "Commands.CommandInjectable", (object[] args) => injectableMock.Object).Execute();
 
             var injectableCmd = Ioc.Resolve<ICommand>("Commands.CommandInjectable");
             if (injectableCmd is ICommandInjectable injectable)
