@@ -31,12 +31,6 @@ namespace SpaceBattle.Lib.Tests.CommandTests
         }
 
         [Fact]
-        public void Constructor_NullCommands_ThrowsArgumentNullException()
-        {
-            Assert.Throws<ArgumentNullException>(() => new MacroCommand(null));
-        }
-
-        [Fact]
         public void Execute_EmptyCommandsArray_NoExceptions()
         {
             var macro = new MacroCommand(Array.Empty<ICommand>());

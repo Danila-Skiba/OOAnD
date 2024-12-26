@@ -61,16 +61,16 @@ namespace SpaceBattle.Lib.Tests.CommandTests
         [Fact]
         public void Execute_Should_ThrowException_When_Args0_IsNull()
         {
-            //Arrange
+            // Arrange
             var registerCommand = new RegisterIoCDependencyMacroCommand();
-            var args = new object[] { null };
+            var args = new object?[] { null }; // Изменено на object?[]
 
-            //Act
+            // Act
             registerCommand.Execute();
 
-            //Assert
+            // Assert
             var exception = Assert.Throws<ArgumentException>(() =>
-                Ioc.Resolve<ICommand>("Commands.Macro", args)
+                Ioc.Resolve<ICommand>("Commands.Macro", args!)
             );
             Assert.Equal("Invalid arguments for Commands.Macro", exception.Message);
         }

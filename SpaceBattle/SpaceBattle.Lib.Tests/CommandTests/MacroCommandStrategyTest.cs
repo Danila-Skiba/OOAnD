@@ -61,7 +61,7 @@ namespace SpaceBattle.Lib.Tests
             Ioc.Resolve<App.ICommand>("IoC.Register", "Commands.Rotate", (object[] args) => new Rotate((IRotating)args[0])).Execute();
 
             var strategy = new CreateMacroCommandStrategy("Macro.Test");
-            var exception = Assert.Throws<InvalidOperationException>(() => strategy.Resolve(new object[] { null }));
+            var exception = Assert.Throws<InvalidOperationException>(() => strategy.Resolve(new object[] { null! }));
 
             Assert.Equal("Команда 'Commands.Rotate' принимает аргумент null.", exception.Message);
         }
