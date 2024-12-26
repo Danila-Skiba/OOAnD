@@ -1,4 +1,4 @@
-public class Angle
+﻿public class Angle
 {
     private static readonly int d = 8;
     private readonly int n;

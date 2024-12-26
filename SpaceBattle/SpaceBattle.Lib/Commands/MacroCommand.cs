@@ -6,7 +6,7 @@
 
         public MacroCommand(ICommand[] commands)
         {
-            _commands = commands ?? throw new ArgumentNullException(nameof(commands));
+            _commands = commands;
         }
 
         public void Execute()
