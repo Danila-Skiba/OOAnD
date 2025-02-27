@@ -4,7 +4,7 @@ using Moq;
 
 namespace SpaceBattle.Lib.Tests
 {
-    public class RegisterIoCDependencySendCommandTest: IDisposable
+    public class RegisterIoCDependencySendCommandTest : IDisposable
     {
         public RegisterIoCDependencySendCommandTest()
         {
