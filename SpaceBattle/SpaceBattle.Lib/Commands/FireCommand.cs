@@ -13,7 +13,7 @@ namespace SpaceBattle.Lib
 
         public void Execute()
         {
-            var weapon = Ioc.Resolve<IWeapon>("Weapon.Create", _shooter.Position, _shooter.FireDirection);
+            var weapon = Ioc.Resolve<IMoving>("Weapon.Create", _shooter.Position, _shooter.FireDirection);
             _lastWeaponId = Guid.NewGuid().ToString();
             Ioc.Resolve<ICommand>("Game.Item.Add", _lastWeaponId, weapon).Execute();
         }
