@@ -5,7 +5,7 @@ namespace SpaceBattle.Lib
     public class FireCommand : ICommand
     {
         private readonly IFireable _shooter;
-        private string _lastWeaponId;
+        private string? _lastWeaponId;
         public FireCommand(IFireable shooter)
         {
             _shooter = shooter;
@@ -18,6 +18,6 @@ namespace SpaceBattle.Lib
             Ioc.Resolve<ICommand>("Game.Item.Add", _lastWeaponId, weapon).Execute();
         }
 
-        public string GetLastWeaponId() { return _lastWeaponId; }
+        public string? GetLastWeaponId() { return _lastWeaponId; }
     }
 }
