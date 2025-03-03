@@ -22,7 +22,7 @@ namespace SpaceBattle.Lib.Tests
             fireableMock.Setup(f => f.Position).Returns(position);
             fireableMock.Setup(f => f.FireDirection).Returns(fireDirection);
 
-            var weaponMock = new Mock<IWeapon>();
+            var weaponMock = new Mock<IMoving>();
             weaponMock.Setup(w => w.Position).Returns(position);
             weaponMock.Setup(w => w.Velocity).Returns(fireDirection);
 
