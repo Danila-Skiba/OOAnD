@@ -44,7 +44,7 @@ namespace SpaceBattle.Lib.Tests
             fireCommand.Execute();
 
             Assert.IsType<FireCommand>(fireCommand);
-            var weaponId = ((FireCommand)fireCommand).GetLastWeaponId();
+            var weaponId = ((FireCommand)fireCommand).GetLastWeaponId()!;
             var addedItem = Ioc.Resolve<object>("Game.Item.Get", weaponId);
             Assert.Equal(weaponMock.Object, addedItem);
         }
