@@ -24,7 +24,7 @@ namespace SpaceBattle.Lib.Tests
             var weaponMock = new Mock<IMoving>();
             weaponMock.SetupGet(a => a.Position).Returns(position);
             weaponMock.SetupGet(a => a.Velocity).Returns(velocity);
-            weaponMock.SetupProperty(w => w.Position); // Разрешаем установку Position
+            weaponMock.SetupProperty(w => w.Position);
 
             var receiverMock = new Mock<ICommandReceiver>();
 
