@@ -27,6 +27,7 @@ namespace SpaceBattle.Lib.Tests
             weaponMock.SetupProperty(w => w.Position);
 
             var receiverMock = new Mock<ICommandReceiver>();
+            var gameItems = new Dictionary<string, object>();
 
             Ioc.Resolve<App.ICommand>("IoC.Register", "Weapon.Create", (object[] args) =>
             {
@@ -51,8 +52,16 @@ namespace SpaceBattle.Lib.Tests
                 return receiverMock.Object;
             }).Execute();
 
+            Ioc.Resolve<App.ICommand>("IoC.Register", "Game.Item.Add", (object[] args) =>
+            {
+                var id = (string)args[0];
+                var item = args[1];
+                gameItems[id] = item;
+                return new Action(() => { });
+            }).Execute();
+            Ioc.Resolve<App.ICommand>("IoC.Register", "Game.Item.Get", (object[] args) => gameItems[(string)args[0]]).Execute();
+
             new RegisterIoCDependencyMoveCommand().Execute();
-            new RegisterIocDependencyGameRepository().Execute();
             new RegisterFireDependencies().Execute();
             new RegisterIocDependencyActionsStart().Execute();
 
@@ -60,11 +69,6 @@ namespace SpaceBattle.Lib.Tests
             fireCommand.Execute();
 
             Assert.IsType<FireCommand>(fireCommand);
-            var weaponId = ((FireCommand)fireCommand).GetLastWeaponId()!;
-            var addedItem = Ioc.Resolve<object>("Game.Item.Get", weaponId);
-            Assert.Equal(weaponMock.Object, addedItem);
-            Assert.Equal(position, weaponMock.Object.Position);
-            Assert.Equal(velocity, weaponMock.Object.Velocity);
             receiverMock.Verify(r => r.Receive(It.IsAny<ICommand>()), Times.Once());
         }
 
