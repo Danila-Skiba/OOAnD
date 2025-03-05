@@ -20,6 +20,7 @@ namespace SpaceBattle.Lib.Tests
             var fireDirection = new Vector(new[] { 2, 1 });
             var speed = 2.0;
             var velocity = new Vector(new[] { (int)(2 * speed), (int)(1 * speed) });
+            var cmd = new Mock<ICommand>();
 
             var weaponMock = new Mock<IMoving>();
             weaponMock.SetupGet(a => a.Position).Returns(position);
@@ -44,7 +45,7 @@ namespace SpaceBattle.Lib.Tests
                 var weapon = (IMoving)args[0];
                 var pos = (Vector)args[1];
                 weapon.Position = pos;
-                return new Action(() => { });
+                return cmd.Object;
             }).Execute();
 
             Ioc.Resolve<App.ICommand>("IoC.Register", "Game.Receiver", (object[] args) =>
@@ -57,7 +58,7 @@ namespace SpaceBattle.Lib.Tests
                 var id = (string)args[0];
                 var item = args[1];
                 gameItems[id] = item;
-                return new Action(() => { });
+                return cmd.Object;
             }).Execute();
             Ioc.Resolve<App.ICommand>("IoC.Register", "Game.Item.Get", (object[] args) => gameItems[(string)args[0]]).Execute();
 
