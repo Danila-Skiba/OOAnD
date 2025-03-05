@@ -7,7 +7,6 @@ namespace SpaceBattle.Lib
         private readonly Vector _position;
         private readonly Vector _fireDirection;
         private readonly double _speed;
-        private string? _lastWeaponId;
         public FireCommand(Vector position, Vector fireDirection, double speed = 1.0)
         {
             _position = position;
@@ -17,14 +16,14 @@ namespace SpaceBattle.Lib
 
         public void Execute()
         {
-            _lastWeaponId = Guid.NewGuid().ToString();
-            var weaponDict = Ioc.Resolve<IDictionary<string, object>>("Weapon.Create", _lastWeaponId);
+            var weaponId = Guid.NewGuid().ToString();
+            var weaponDict = Ioc.Resolve<IDictionary<string, object>>("Weapon.Create", weaponId);
 
             var weapon = Ioc.Resolve<IMoving>("Adapters.IMovingObject", weaponDict["Id"]);
 
             Ioc.Resolve<ICommand>("Weapon.Setup", weapon, _position, _fireDirection, _speed).Execute();
 
-            Ioc.Resolve<ICommand>("Game.Item.Add", _lastWeaponId, weapon).Execute();
+            Ioc.Resolve<ICommand>("Game.Item.Add", weaponId, weapon).Execute();
 
             var moveCommandWeapon = Ioc.Resolve<ICommand>("Commands.Move", weapon);
             var receiver = Ioc.Resolve<ICommandReceiver>("Game.Receiver");
@@ -35,7 +34,5 @@ namespace SpaceBattle.Lib
             });
             startCommandWeapon.Execute();
         }
-
-        public string? GetLastWeaponId() { return _lastWeaponId; }
     }
 }
