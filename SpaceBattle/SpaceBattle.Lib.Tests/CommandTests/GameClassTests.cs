@@ -1,88 +1,149 @@
-﻿using System.Reflection;
+﻿using App;
+using App.Scopes;
 using Moq;
 
-namespace SpaceBattle.Lib.Tests
+namespace SpaceBattle.Lib.Tests;
+
+public class GameTests : IDisposable
 {
-    public class GameTests
+    public GameTests()
     {
-        [Fact]
-        public void ExecuteAllCommands()
-        {
-            var game = new Game();
-            var cmd1 = new Mock<ICommand>();
-            var cmd2 = new Mock<ICommand>();
-            game.Receive(cmd1.Object);
-            game.Receive(cmd2.Object);
-            game.Execute();
-            cmd1.Verify(c => c.Execute(), Times.Once);
-            cmd2.Verify(c => c.Execute(), Times.Once);
-        }
+        new InitCommand().Execute();
+        var iocScope = Ioc.Resolve<object>("IoC.Scope.Create");
+        Ioc.Resolve<App.ICommand>("IoC.Scope.Current.Set", iocScope).Execute();
+    }
 
-        [Fact]
-        public void ExecuteQueueIsEmpty()
-        {
-            var game = new Game();
-            game.Execute();
-            Assert.True(true);
-        }
+    [Fact]
+    public void ExecuteCommandsTest()
+    {
+        Ioc.Resolve<App.ICommand>(
+            "IoC.Register",
+            "Game.TimeQuant",
+            (object[] args) => (object)TimeSpan.FromMilliseconds(50)
+        ).Execute();
 
-        [Fact]
-        public void ExecuteCommandsException()
-        {
-            var game = new Game();
-            var cmd1 = new Mock<ICommand>();
-            var cmd2 = new Mock<ICommand>();
-            cmd1.Setup(c => c.Execute()).Throws(new Exception("Test exception"));
-            game.Receive(cmd1.Object);
-            game.Receive(cmd2.Object);
-            game.Execute();
-            cmd1.Verify(c => c.Execute(), Times.Once);
-            cmd2.Verify(c => c.Execute(), Times.Once);
-        }
+        var game_queue = new Queue<SpaceBattle.Lib.ICommand>();
 
-        [Fact]
-        public void ExceptionCommandNull()
-        {
-            var game = new Game();
-            var exception = Assert.Throws<ArgumentNullException>(() => game.Receive(null!));
-            Assert.Equal("cmd", exception.ParamName);
-        }
+        Ioc.Resolve<App.ICommand>(
+            "IoC.Register",
+            "Game.CommandsQueue",
+            (object[] args) => game_queue
+        ).Execute();
 
-        [Fact]
-        public void Execute_NullCommandInQueue_ThrowsInvalidOperationException()
-        {
-            var game = new Game();
-            var commandsField = typeof(Game).GetField("_commands", BindingFlags.NonPublic | BindingFlags.Instance);
-            if (commandsField is null)
-            {
-                throw new InvalidOperationException("Поле _commands не найдено");
-            }
+        var game_scope = Ioc.Resolve<object>("IoC.Scope.Current");
 
-            var value = commandsField.GetValue(game);
-            if (value is not Queue<ICommand> commandsQueue)
-            {
-                throw new InvalidOperationException("Поле _commands не имеет ожидаемого типа");
-            }
+        var cmd1 = new Mock<SpaceBattle.Lib.ICommand>();
+        cmd1.Setup(c => c.Execute());
+        var cmd2 = new Mock<SpaceBattle.Lib.ICommand>();
+        cmd2.Setup(c => c.Execute());
 
-            ICommand? nullCommand = null;
-            commandsQueue.Enqueue(nullCommand!);
-            var exception = Assert.Throws<InvalidOperationException>(() => game.Execute());
-            Assert.Equal("Обнаружена null-команда в очереди.", exception.Message);
-        }
+        game_queue.Enqueue(cmd1.Object);
+        game_queue.Enqueue(cmd2.Object);
 
-        [Fact]
-        public void Execute_CommandsAreExecutedInFIFOOrder()
-        {
-            var game = new Game();
-            var executionOrder = new List<string>();
-            var cmd1 = new Mock<ICommand>();
-            cmd1.Setup(c => c.Execute()).Callback(() => executionOrder.Add("первый"));
-            var cmd2 = new Mock<ICommand>();
-            cmd2.Setup(c => c.Execute()).Callback(() => executionOrder.Add("второй"));
-            game.Receive(cmd1.Object);
-            game.Receive(cmd2.Object);
-            game.Execute();
-            Assert.Equal(new List<string> { "первый", "второй" }, executionOrder);
-        }
+        var game = new Game(game_scope);
+
+        game.Execute();
+
+        cmd1.Verify(c => c.Execute(), Times.Once());
+        cmd2.Verify(c => c.Execute(), Times.Once());
+    }
+
+    [Fact]
+    public void ExecuteEmptyQueueTest()
+    {
+        Ioc.Resolve<App.ICommand>(
+            "IoC.Register",
+            "Game.TimeQuant",
+            (object[] args) => (object)TimeSpan.FromMilliseconds(50)
+        ).Execute();
+
+        var game_queue = new Queue<SpaceBattle.Lib.ICommand>();
+
+        Ioc.Resolve<App.ICommand>(
+            "IoC.Register",
+            "Game.CommandsQueue",
+            (object[] args) => game_queue
+        ).Execute();
+
+        var game_scope = Ioc.Resolve<object>("IoC.Scope.Current");
+        var game = new Game(game_scope);
+
+        var exception = Record.Exception(() => game.Execute());
+        Assert.Null(exception);
+    }
+
+    [Fact]
+    public void ExecuteCommandsTimeExceededTest()
+    {
+        Ioc.Resolve<App.ICommand>(
+            "IoC.Register",
+            "Game.TimeQuant",
+            (object[] args) => (object)TimeSpan.FromMilliseconds(10)
+        ).Execute();
+
+        var game_queue = new Queue<SpaceBattle.Lib.ICommand>();
+
+        Ioc.Resolve<App.ICommand>(
+            "IoC.Register",
+            "Game.CommandsQueue",
+            (object[] args) => game_queue
+        ).Execute();
+
+        var game_scope = Ioc.Resolve<object>("IoC.Scope.Current");
+
+        var cmd1 = new Mock<SpaceBattle.Lib.ICommand>();
+        cmd1.Setup(c => c.Execute()).Callback(() => Thread.Sleep(20));
+        var cmd2 = new Mock<SpaceBattle.Lib.ICommand>();
+        cmd2.Setup(c => c.Execute());
+
+        game_queue.Enqueue(cmd1.Object);
+        game_queue.Enqueue(cmd2.Object);
+
+        var game = new Game(game_scope);
+
+        game.Execute();
+
+        cmd1.Verify(c => c.Execute(), Times.Once());
+        cmd2.Verify(c => c.Execute(), Times.Never());
+    }
+
+    [Fact]
+    public void ExecuteCommandExceptionTest()
+    {
+        Ioc.Resolve<App.ICommand>(
+            "IoC.Register",
+            "Game.TimeQuant",
+            (object[] args) => (object)TimeSpan.FromMilliseconds(50)
+        ).Execute();
+
+        var game_queue = new Queue<SpaceBattle.Lib.ICommand>();
+
+        Ioc.Resolve<App.ICommand>(
+            "IoC.Register",
+            "Game.CommandsQueue",
+            (object[] args) => game_queue
+        ).Execute();
+
+        var game_scope = Ioc.Resolve<object>("IoC.Scope.Current");
+
+        var cmd1 = new Mock<SpaceBattle.Lib.ICommand>();
+        cmd1.Setup(c => c.Execute()).Throws(new Exception());
+        var cmd2 = new Mock<SpaceBattle.Lib.ICommand>();
+        cmd2.Setup(c => c.Execute());
+
+        game_queue.Enqueue(cmd1.Object);
+        game_queue.Enqueue(cmd2.Object);
+
+        var game = new Game(game_scope);
+
+        game.Execute();
+
+        cmd1.Verify(c => c.Execute(), Times.Once());
+        cmd2.Verify(c => c.Execute(), Times.Once());
+    }
+
+    public void Dispose()
+    {
+        Ioc.Resolve<App.ICommand>("IoC.Scope.Current.Clear").Execute();
     }
 }
