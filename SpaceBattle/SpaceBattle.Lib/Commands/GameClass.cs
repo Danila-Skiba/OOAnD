@@ -1,38 +1,35 @@
-﻿namespace SpaceBattle.Lib
+﻿using System.Diagnostics;
+using App;
+namespace SpaceBattle.Lib;
+
+public class Game : ICommand
 {
-    public class Game : ICommand, ICommandReceiver
+    private readonly object _game_scope;
+    public Game(object game_scope)
     {
-        private readonly Queue<ICommand> _commands = new Queue<ICommand>();
+        _game_scope = game_scope;
+    }
 
-        public void Receive(ICommand cmd)
+    public void Execute()
+    {
+        Ioc.Resolve<App.ICommand>("IoC.Scope.Current.Set", _game_scope).Execute();
+
+        var queue = Ioc.Resolve<Queue<ICommand>>("Game.CommandsQueue");
+
+        var time_quant = (TimeSpan)Ioc.Resolve<object>("Game.TimeQuant");
+
+        var timer = Stopwatch.StartNew();
+
+        while ((timer.Elapsed < time_quant) && (queue.Count > 0))
         {
-            if (cmd == null)
+            var cmd = queue.Dequeue();
+            try
             {
-                throw new ArgumentNullException(nameof(cmd), "Команда не может быть null.");
+                cmd.Execute();
             }
-
-            _commands.Enqueue(cmd);
-        }
-
-        public void Execute()
-        {
-            while (_commands.Count > 0)
+            catch (Exception ex)
             {
-                var cmd = _commands.Dequeue();
-                if (cmd == null)
-                {
-                    throw new InvalidOperationException("Обнаружена null-команда в очереди.");
-                }
-
-                try
-                {
-                    cmd.Execute();
-                }
-                catch (Exception ex)
-                {
-
-                    Console.WriteLine($"Ошибка при выполнении команды: {ex.Message}");
-                }
+                Console.WriteLine($"Ошибка при выполнении команды: {ex.Message}");
             }
         }
     }
