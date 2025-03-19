@@ -6,14 +6,21 @@ namespace SpaceBattle.Lib
     {
         public void Execute()
         {
-            var game = new Game();
-            Ioc.Resolve<App.ICommand>(
-                "IoC.Register",
-                "Game.Receiver",
-                (object[] args) =>
+            Ioc.Resolve<App.ICommand>("IoC.Register", "Game.Receiver", (object[] args) =>
+            {
+                Queue<ICommand> queue;
+                try
                 {
-                    return game;
-                }).Execute();
+                    queue = Ioc.Resolve<Queue<ICommand>>("Game.Queue");
+                }
+                catch (System.Exception)
+                {
+                    queue = new Queue<ICommand>();
+                    Ioc.Resolve<App.ICommand>("IoC.Register", "Game.Queue", (object[] args) => queue).Execute();
+                }
+
+                return new GameReceiver(queue);
+            }).Execute();
         }
     }
 }
