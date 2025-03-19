@@ -14,30 +14,44 @@ namespace SpaceBattle.Lib.Tests
         }
 
         [Fact]
-        public void RegisterGameTest()
+        public void Positive_Execute_RegistersGameReceiver()
         {
-            var reg = new IoCRegisterGameOperation();
+            var queue = new Queue<ICommand>();
+            Ioc.Resolve<App.ICommand>("IoC.Register", "Game.Queue", (object[] args) => queue).Execute();
 
-            reg.Execute();
+            var operation = new IoCRegisterGameOperation();
+            operation.Execute();
 
-            var gameReceiver = Ioc.Resolve<object>("Game.Receiver");
-            Assert.IsType<Game>(gameReceiver);
+            var receiver = Ioc.Resolve<ICommandReceiver>("Game.Receiver");
+            Assert.NotNull(receiver);
+            Assert.IsType<GameReceiver>(receiver);
+
+            var testCommand = new Mock<ICommand>();
+            receiver.Receive(testCommand.Object);
+            Assert.Single(queue);
+            Assert.Equal(testCommand.Object, queue.Dequeue());
         }
 
         [Fact]
-        public void ExecuteCommandsTest()
+        public void Negative_Execute_RegistersReceiverWithDefaultQueue()
         {
-            var reg = new IoCRegisterGameOperation();
-            var cmd1 = new Mock<ICommand>();
+            var operation = new IoCRegisterGameOperation();
 
-            reg.Execute();
-            var game = Ioc.Resolve<Game>("Game.Receiver");
+            operation.Execute();
 
-            game.Receive(cmd1.Object);
-            game.Execute();
+            var receiver = Ioc.Resolve<ICommandReceiver>("Game.Receiver");
+            Assert.NotNull(receiver);
+            Assert.IsType<GameReceiver>(receiver);
 
-            cmd1.Verify(cmd => cmd.Execute(), Times.Once);
+            var testCommand = new Mock<ICommand>();
+            receiver.Receive(testCommand.Object);
+
+            var defaultQueue = Ioc.Resolve<Queue<ICommand>>("Game.Queue");
+            Assert.NotNull(defaultQueue);
+            Assert.Single(defaultQueue);
+            Assert.Equal(testCommand.Object, defaultQueue.Dequeue());
         }
+
         public void Dispose()
         {
             Ioc.Resolve<App.ICommand>("IoC.Scope.Current.Clear").Execute();
