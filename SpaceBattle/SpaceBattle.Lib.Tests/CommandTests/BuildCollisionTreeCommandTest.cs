@@ -16,7 +16,7 @@ namespace SpaceBattle.Lib.Tests.CommandTests
         public void BuildCollisionTreeWithLength4()
         {
             var providerMock = new Mock<ICollisionTreeDataProvider>();
-            providerMock.Setup(p => p.GetCollisionVectors()).Returns(new List<int[]>
+            providerMock.Setup(p => p.GetCollisionVectors()).Returns(new List<int[]?>
             {
                 new [] { 1, 1, -1, -1},
                 new [] { 1, 1, 0, 0},
@@ -50,7 +50,7 @@ namespace SpaceBattle.Lib.Tests.CommandTests
         public void BuildCollisionTreeCommandWithInvalidVectors()
         {
             var providerMock = new Mock<ICollisionTreeDataProvider>();
-            providerMock.Setup(p => p.GetCollisionVectors()).Returns(new List<int[]>
+            providerMock.Setup(p => p.GetCollisionVectors()).Returns(new List<int[]?>
             {
                 null,
                 new [] { 1, 1, -1, -1}
@@ -73,7 +73,7 @@ namespace SpaceBattle.Lib.Tests.CommandTests
         public void BuildCollisionTreeCommandEmptyVectors()
         {
             var providerMock = new Mock<ICollisionTreeDataProvider>();
-            providerMock.Setup(p => p.GetCollisionVectors()).Returns(new List<int[]>());
+            providerMock.Setup(p => p.GetCollisionVectors()).Returns(new List<int[]?>());
 
             var buildCommand = new BuildCollisionTreeCommand(providerMock.Object);
             buildCommand.Execute();

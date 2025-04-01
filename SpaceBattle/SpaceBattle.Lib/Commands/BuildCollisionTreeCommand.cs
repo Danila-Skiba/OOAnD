@@ -29,6 +29,7 @@ namespace SpaceBattle.Lib
                     {
                         current[param] = new Dictionary<int, object>();
                     }
+
                     current = (Dictionary<int, object>)current[param];
                 });
 
