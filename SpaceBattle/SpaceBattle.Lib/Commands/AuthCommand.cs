@@ -1,4 +1,5 @@
 ﻿using App;
+
 namespace SpaceBattle.Lib
 {
     public class AuthCommand : ICommand
@@ -16,10 +17,10 @@ namespace SpaceBattle.Lib
 
         public void Execute()
         {
-            var playerPermissions = (IEnumerable<string>)Ioc.Resolve<object>("Game.Item.Get", $"{_objectId}_permissions");
+            var playerPermissions = Ioc.Resolve<IDictionary<string, string>>("Game.Item.Get", $"{_objectId}_permissions");
+            var permissions = (IEnumerable<KeyValuePair<string, string>>)playerPermissions;
+            _ = permissions.FirstOrDefault(e => e.Key == _playerId && e.Value == _operation).Value ?? throw new UnauthorizedAccessException($"Player {_playerId} is not authorized to perform operation '{_operation}' on object {_objectId}.");
 
-            var permission = playerPermissions.FirstOrDefault(perm => perm == $"{_playerId}:{_operation}")
-            ?? throw new UnauthorizedAccessException($"Player {_playerId} is not authorized to perform operation '{_operation}' on object {_objectId}.");
         }
     }
 }

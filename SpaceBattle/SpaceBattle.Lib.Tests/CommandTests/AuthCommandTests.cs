@@ -36,7 +36,7 @@ namespace SpaceBattle.Lib.Tests
             var objectId = "ship1";
             var operation = "Fire";
 
-            Ioc.Resolve<ICommand>("Game.Item.Add", $"{objectId}_permissions", new List<string> { $"{playerId}:{operation}" }).Execute();
+            Ioc.Resolve<ICommand>("Game.Item.Add", $"{objectId}_permissions", new Dictionary<string, string>() { { playerId, operation } }).Execute();
 
             var authCommand = new AuthCommand(playerId, objectId, operation);
 
@@ -52,7 +52,7 @@ namespace SpaceBattle.Lib.Tests
             var objectId = "ship1";
             var operation = "Fire";
 
-            Ioc.Resolve<ICommand>("Game.Item.Add", $"{objectId}_permissions", new List<string> { $"{playerId}:Move" }).Execute();
+            Ioc.Resolve<ICommand>("Game.Item.Add", $"{objectId}_permissions", new Dictionary<string, string> { { playerId, "Move" } }).Execute();
 
             var authCommand = new AuthCommand(playerId, objectId, operation);
 
@@ -67,7 +67,7 @@ namespace SpaceBattle.Lib.Tests
             var objectId = "ship1";
             var operation = "Fire";
 
-            Ioc.Resolve<ICommand>("Game.Item.Add", $"{objectId}_permissions", new List<string>()).Execute();
+            Ioc.Resolve<ICommand>("Game.Item.Add", $"{objectId}_permissions", new Dictionary<string, string>()).Execute();
 
             var authCommand = new AuthCommand(playerId, objectId, operation);
 
