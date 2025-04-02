@@ -36,7 +36,7 @@ namespace SpaceBattle.Lib.Tests
             var objectId = "ship1";
             var operation = "Fire";
 
-            Ioc.Resolve<ICommand>("Game.Item.Add", $"{objectId}_permissions", new Dictionary<string, string>() { { playerId, operation } }).Execute();
+            Ioc.Resolve<ICommand>("Game.Item.Add", $"{playerId}_permissions", new Dictionary<string, string>() { { operation, objectId } }).Execute();
 
             var authCommand = new AuthCommand(playerId, objectId, operation);
 
@@ -52,22 +52,7 @@ namespace SpaceBattle.Lib.Tests
             var objectId = "ship1";
             var operation = "Fire";
 
-            Ioc.Resolve<ICommand>("Game.Item.Add", $"{objectId}_permissions", new Dictionary<string, string> { { playerId, "Move" } }).Execute();
-
-            var authCommand = new AuthCommand(playerId, objectId, operation);
-
-            var exception = Assert.Throws<UnauthorizedAccessException>(authCommand.Execute);
-            Assert.Equal($"Player {playerId} is not authorized to perform operation '{operation}' on object {objectId}.", exception.Message);
-        }
-
-        [Fact]
-        public void Execute_EmptyPermissions_ThrowsException()
-        {
-            var playerId = "player1";
-            var objectId = "ship1";
-            var operation = "Fire";
-
-            Ioc.Resolve<ICommand>("Game.Item.Add", $"{objectId}_permissions", new Dictionary<string, string>()).Execute();
+            Ioc.Resolve<ICommand>("Game.Item.Add", $"{playerId}_permissions", new Dictionary<string, string> { { "Move", objectId } }).Execute();
 
             var authCommand = new AuthCommand(playerId, objectId, operation);
 

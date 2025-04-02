@@ -17,10 +17,13 @@ namespace SpaceBattle.Lib
 
         public void Execute()
         {
-            var playerPermissions = Ioc.Resolve<IDictionary<string, string>>("Game.Item.Get", $"{_objectId}_permissions");
-            var permissions = (IEnumerable<KeyValuePair<string, string>>)playerPermissions;
-            _ = permissions.FirstOrDefault(e => e.Key == _playerId && e.Value == _operation).Value ?? throw new UnauthorizedAccessException($"Player {_playerId} is not authorized to perform operation '{_operation}' on object {_objectId}.");
 
+            var permissions = Ioc.Resolve<IDictionary<string, string>>("Game.Item.Get", $"{_playerId}_permissions");
+
+            if (!permissions.TryGetValue(_operation, out var permittedObject) || permittedObject != _objectId)
+            {
+                throw new UnauthorizedAccessException($"Player {_playerId} is not authorized to perform operation '{_operation}' on object {_objectId}.");
+            }
         }
     }
 }
