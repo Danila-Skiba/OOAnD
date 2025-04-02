@@ -16,7 +16,7 @@ public class Game : ICommand
 
         var queue = Ioc.Resolve<Queue<ICommand>>("Game.CommandsQueue");
 
-        var time_quant = (TimeSpan)Ioc.Resolve<object>("Game.TimeQuant");
+        var time_quant = Ioc.Resolve<TimeSpan>("Game.TimeQuant");
 
         var timer = Stopwatch.StartNew();
 
