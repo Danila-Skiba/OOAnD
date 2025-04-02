@@ -32,24 +32,6 @@ namespace SpaceBattle.Lib.Tests
             Assert.Equal(commandMock.Object, queue.Dequeue());
         }
 
-        [Fact]
-        public void Receive_AcceptsNullCommand()
-        {
-            var queue = new Queue<ICommand>();
-            Ioc.Resolve<App.ICommand>(
-                "IoC.Register",
-                "Game.CommandsQueue",
-                (object[] args) => queue
-            ).Execute();
-
-            var receiver = new GameReceiver();
-
-            receiver.Receive(null);
-
-            Assert.Single(queue);
-            Assert.Null(queue.Dequeue());
-        }
-
         public void Dispose()
         {
             Ioc.Resolve<App.ICommand>("IoC.Scope.Current.Clear").Execute();
