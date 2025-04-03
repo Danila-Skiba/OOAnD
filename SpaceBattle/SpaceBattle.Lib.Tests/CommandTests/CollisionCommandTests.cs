@@ -1,6 +1,5 @@
-using App;
+﻿using App;
 using App.Scopes;
-using SpaceBattle.Lib;
 using Moq;
 
 namespace SpaceBattle.Lib.Tests
@@ -34,32 +33,52 @@ namespace SpaceBattle.Lib.Tests
                 var obj = (IDictionary<string, object>)args[0];
                 return (int[])obj["Velocity"];
             }).Execute();
-
-
         }
         [Fact]
         public void CollisionCommandTrueTest()
         {
-            var collisionCommand = new Mock<ICommand>();
-            collisionCommand.Setup(c => c.Execute()).Verifiable("Collision!");
+            var collisionHandle = new Mock<ICommand>();
+            collisionHandle.Setup(c => c.Execute());
 
-            Ioc.Resolve<App.ICommand>("IoC.Register", "Collision.Handle", (object[] args) => collisionCommand.Object).Execute();
+            Ioc.Resolve<App.ICommand>("IoC.Register", "Collision.Handle", (object[] args) => collisionHandle.Object).Execute();
             var obj1 = new Mock<IDictionary<string, object>>();
             var obj2 = new Mock<IDictionary<string, object>>();
 
-            obj1.SetupSet(obj => obj["Position"] = new int[] { 0, 0 });
-            obj2.SetupSet(obj => obj["Position"] = new int[] { 1, 1 });
+            obj1.Setup(obj => obj["Position"]).Returns(new int[] { 0, 0 });
+            obj2.Setup(obj => obj["Position"]).Returns(new int[] { 1, 1 });
 
-            obj1.SetupSet(obj => obj["Velocity"] = new int[] { 1, 1 });
-            obj2.SetupSet(obj => obj["Velocity"] = new int[] { 1, 1 });
+            obj1.Setup(obj => obj["Velocity"]).Returns(new int[] { 1, 1 });
+            obj2.Setup(obj => obj["Velocity"]).Returns(new int[] { 1, 1 });
 
             var commandCollision = new CollisionCommand(obj1.Object, obj2.Object);
 
             commandCollision.Execute();
 
-            collisionCommand.VerifyAll();
+            collisionHandle.Verify(c => c.Execute(), Times.Once());
         }
 
+        [Fact]
+        public void CollisionCommandFalseTest()
+        {
+            var collisionHandle = new Mock<ICommand>();
+            collisionHandle.Setup(c => c.Execute());
+
+            Ioc.Resolve<App.ICommand>("IoC.Register", "Collision.Handle", (object[] args) => collisionHandle.Object).Execute();
+            var obj1 = new Mock<IDictionary<string, object>>();
+            var obj2 = new Mock<IDictionary<string, object>>();
+
+            obj1.Setup(obj => obj["Position"]).Returns(new int[] { 0, 0 });
+            obj2.Setup(obj => obj["Position"]).Returns(new int[] { 1, 1 });
+
+            obj1.Setup(obj => obj["Velocity"]).Returns(new int[] { 1, 3 });
+            obj2.Setup(obj => obj["Velocity"]).Returns(new int[] { 1, 1 });
+
+            var commandCollision = new CollisionCommand(obj1.Object, obj2.Object);
+
+            commandCollision.Execute();
+
+            collisionHandle.Verify(c => c.Execute(), Times.Never());
+        }
         public void Dispose()
         {
             Ioc.Resolve<App.ICommand>("IoC.Scope.Current.Clear").Execute();

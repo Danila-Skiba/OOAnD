@@ -1,13 +1,11 @@
-using App;
-using System.Collections.Generic;
-using System.Linq;
+﻿using App;
 
 namespace SpaceBattle.Lib
 {
     public class CollisionCommand : ICommand
     {
-        private object _obj1;
-        private object _obj2;
+        private readonly object _obj1;
+        private readonly object _obj2;
 
         public CollisionCommand(object obj1, object obj2)
         {
@@ -30,13 +28,15 @@ namespace SpaceBattle.Lib
 
             var collisionTree = Ioc.Resolve<IDictionary<int, object>>("Game.CollisionTree");
 
-            bool collision = CheckCollision(collisionTree, branch);
+            var collision = CheckCollision(collisionTree, branch);
 
             if (collision)
+            {
                 Ioc.Resolve<ICommand>("Collision.Handle", _obj1, _obj2).Execute();
+            }
         }
 
-        static bool CheckCollision(IDictionary<int, object> collTree, int[] parameters)
+        private static bool CheckCollision(IDictionary<int, object> collTree, int[] parameters)
         {
             object current = collTree;
             return parameters.All(param =>
@@ -46,6 +46,7 @@ namespace SpaceBattle.Lib
                     current = next;
                     return true;
                 }
+
                 return false;
             });
         }
