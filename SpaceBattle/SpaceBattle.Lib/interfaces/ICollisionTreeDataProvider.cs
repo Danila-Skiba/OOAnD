@@ -2,6 +2,6 @@
 {
     public interface ICollisionTreeDataProvider
     {
-        IEnumerable<int[]?> GetCollisionVectors();
+        List<int[]> GetVectors();
     }
 }
