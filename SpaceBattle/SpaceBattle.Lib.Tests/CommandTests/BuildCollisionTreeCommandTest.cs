@@ -16,12 +16,7 @@ namespace SpaceBattle.Lib.Tests.CommandTests
         [Fact]
         public void BuildCollisionTreeFromFile()
         {
-            var treeInstance = new Dictionary<int, object>();
-            Ioc.Resolve<App.ICommand>("IoC.Register", "Game.Struct.CollisionTree", (object[] args) => treeInstance).Execute();
-
-            var treeBefore = Ioc.Resolve<Dictionary<int, object>>("Game.Struct.CollisionTree");
-            Assert.Empty(treeBefore);
-
+            var treeKey = "Game.CollisionTree.Object1";
             var filePath = "../../../testTree.txt";
 
             Ioc.Resolve<App.ICommand>("IoC.Register", "CollisionDataProvider.FromFile", (object[] args) => new FileCollisionTreeDataProvider((string)args[0])).Execute();
@@ -34,10 +29,10 @@ namespace SpaceBattle.Lib.Tests.CommandTests
             var providerMock = new Mock<ICollisionTreeDataProvider>();
             providerMock.Setup(p => p.GetVectors()).Returns(vectors);
 
-            var buildCommand = new BuildCollisionTreeCommand(providerMock.Object);
+            var buildCommand = new BuildCollisionTreeCommand(providerMock.Object, treeKey);
             buildCommand.Execute();
 
-            var tree = Ioc.Resolve<Dictionary<int, object>>("Game.Struct.CollisionTree");
+            var tree = Ioc.Resolve<Dictionary<int, object>>(treeKey);
             Assert.NotNull(tree);
 
             Assert.Contains(1, tree.Keys);
@@ -65,12 +60,13 @@ namespace SpaceBattle.Lib.Tests.CommandTests
         [Fact]
         public void BuildCollisionTreeCommandFailsToReadFile()
         {
+            var treeKey = "Game.CollisionTree.Object2";
             var invalidFilePath = "nonexistent_file.txt";
 
             Ioc.Resolve<App.ICommand>("IoC.Register", "CollisionDataProvider.FromFile", (object[] args) => new FileCollisionTreeDataProvider((string)args[0])).Execute();
             var provider = Ioc.Resolve<ICollisionTreeDataProvider>("CollisionDataProvider.FromFile", invalidFilePath);
 
-            var buildCommand = new BuildCollisionTreeCommand(provider);
+            var buildCommand = new BuildCollisionTreeCommand(provider, treeKey);
 
             var exception = Assert.Throws<FileNotFoundException>(() => buildCommand.Execute());
             Assert.Contains("nonexistent_file.txt", exception.Message);

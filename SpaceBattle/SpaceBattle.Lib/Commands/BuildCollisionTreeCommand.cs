@@ -5,16 +5,18 @@ namespace SpaceBattle.Lib
     public class BuildCollisionTreeCommand : ICommand
     {
         private readonly ICollisionTreeDataProvider provider;
-
-        public BuildCollisionTreeCommand(ICollisionTreeDataProvider provider)
+        private readonly string treeKey;
+        public BuildCollisionTreeCommand(ICollisionTreeDataProvider provider, string treeKey)
         {
             this.provider = provider;
+            this.treeKey = treeKey;
         }
         public void Execute()
         {
             var vectors = provider.GetVectors();
-            var tree = Ioc.Resolve<Dictionary<int, object>>("Game.Struct.CollisionTree");
+            var tree = new Dictionary<int, object>();
             CollisionTreeBuilder.Build(tree, vectors);
+            Ioc.Resolve<App.ICommand>("IoC.Register", treeKey, (object[] args) => tree).Execute();
         }
     }
 }
