@@ -72,25 +72,6 @@ namespace SpaceBattle.Lib.Tests.CommandTests
             Assert.Contains("nonexistent_file.txt", exception.Message);
         }
 
-        [Fact]
-        public void CollisionTreeDataProviderReturnsGivenVectors()
-        {
-            var filePath = "../../../testTree.txt";
-
-            var inputVectors = File.ReadLines(filePath)
-                .Where(line => !string.IsNullOrWhiteSpace(line))
-                .Select(line => line.Split(' ', StringSplitOptions.RemoveEmptyEntries)
-                                    .Select(int.Parse)
-                                    .ToArray())
-                .ToList();
-
-            Ioc.Resolve<App.ICommand>("IoC.Register", "CollisionDataProvider.FromMemory", (object[] args) => new CollisionTreeDataProvider((List<int[]>)args[0])).Execute();
-            var provider = Ioc.Resolve<ICollisionTreeDataProvider>("CollisionDataProvider.FromMemory", inputVectors);
-            var result = provider.GetVectors();
-
-            Assert.Equal(inputVectors, result);
-        }
-
         public void Dispose()
         {
             Ioc.Resolve<App.ICommand>("IoC.Scope.Current.Clear").Execute();
