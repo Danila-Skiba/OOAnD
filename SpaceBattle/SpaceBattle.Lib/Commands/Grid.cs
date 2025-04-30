@@ -57,21 +57,11 @@ namespace SpaceBattle.Lib
         public IEnumerable<IDictionary<string, object>> GetNearbyObjects(Vector position)
         {
             var centerCell = GetCell(position);
-            var nearbyObjects = new List<IDictionary<string, object>>();
-
-            for (var dx = -1; dx <= 1; dx++)
-            {
-                for (var dy = -1; dy <= 1; dy++)
-                {
-                    var cell = (centerCell.Item1 + dx, centerCell.Item2 + dy);
-                    if (cells.ContainsKey(cell))
-                    {
-                        nearbyObjects.AddRange(cells[cell]);
-                    }
-                }
-            }
-
-            return nearbyObjects;
+            return Enumerable.Range(-1, 3)
+                .SelectMany(dx => Enumerable.Range(-1, 3), (dx, dy) => (dx, dy))
+                .Select(offset => (centerCell.Item1 + offset.dx, centerCell.Item2 + offset.dy))
+                .Where(cell => cells.ContainsKey(cell))
+                .SelectMany(cell => cells[cell]);
         }
 
         public bool ContainsObjectInCell(IDictionary<string, object> obj, (int, int) cell)
