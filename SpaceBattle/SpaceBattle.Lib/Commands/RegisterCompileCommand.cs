@@ -1,8 +1,5 @@
+﻿using System.Reflection;
 using App;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Reflection;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 namespace SpaceBattle.Lib
@@ -17,19 +14,26 @@ namespace SpaceBattle.Lib
                 var code = (string)args[0];
                 var syntaxTree = CSharpSyntaxTree.ParseText(code);
 
-                var references = Ioc.Resolve<MetadataReference>("Game.Compile.GerReferences");
+                var references = Ioc.Resolve<List<MetadataReference>>("Game.Compile.GetReferences");
                 var options = new CSharpCompilationOptions(OutputKind.DynamicallyLinkedLibrary);
 
-                var compilation = CSharpCompilation.Create($"Generated_{Guid.NewGuid().ToString()}").AddReferences(references).WithOptions(options).AddSyntaxTrees(syntaxTree);
-
+                var compilation = CSharpCompilation.Create($"Generated_{Guid.NewGuid().ToString()}")
+                    .AddReferences(references)
+                    .WithOptions(options)
+                    .AddSyntaxTrees(syntaxTree);
 
                 using var ms = new System.IO.MemoryStream();
                 var result = compilation.Emit(ms);
+                if (!result.Success)
+                {
+                    var errors = result.Diagnostics
+                        .Select(d => d.ToString());
+                    throw new Exception("Error compilation " + string.Join(",", errors));
+                }
+
                 ms.Seek(0, System.IO.SeekOrigin.Begin);
                 var assembly = Assembly.Load(ms.ToArray());
-
                 return assembly;
-
             }).Execute();
         }
     }

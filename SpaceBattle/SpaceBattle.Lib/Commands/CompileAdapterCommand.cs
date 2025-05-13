@@ -1,20 +1,19 @@
+﻿using System.Reflection;
 using App;
-using System.Reflection;
 namespace SpaceBattle.Lib
 {
-    public class CreateAdapterCommand : ICommand
+    public class CompileAdapterCommand : ICommand
     {
-        private Type _adapterType;
-        public CreateAdapterCommand(Type adapterType)
+        private readonly Type _adapterType;
+        public CompileAdapterCommand(Type adapterType)
         {
             _adapterType = adapterType;
         }
         public void Execute()
         {
             var adaptersDict = Ioc.Resolve<IDictionary<string, Assembly>>("Game.Adapter.DictAssembly");
-            var key = _adapterType.ToString();
-
-            if (!adaptersDict.TryGetValue(key, out Assembly? assembly))
+            var key = _adapterType.Name;
+            if (!adaptersDict.TryGetValue(key, out _))
             {
                 var adapterCodeString = Ioc.Resolve<string>("Game.Adapters.Generate", _adapterType);
 
