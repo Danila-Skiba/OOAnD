@@ -4,9 +4,9 @@ using Moq;
 
 namespace SpaceBattle.Lib.Tests
 {
-    public class MoveWithCollisionCommandTests : IDisposable
+    public class CollisionCommandWithGridTests : IDisposable
     {
-        public MoveWithCollisionCommandTests()
+        public CollisionCommandWithGridTests()
         {
             new InitCommand().Execute();
             var iocScope = Ioc.Resolve<object>("IoC.Scope.Create");
@@ -21,49 +21,47 @@ namespace SpaceBattle.Lib.Tests
         public void Execute_NoNearbyObjects_NoCollisionChecks()
         {
             var movingMock = new Mock<IMoving>();
-            var moveCommandMock = new Mock<ICommand>();
             var emptyObjects = Enumerable.Empty<object>();
+            var collisionCheckMock = new Mock<ICommand>();
 
-            Ioc.Resolve<App.ICommand>("IoC.Register", "Commands.Move", (object[] args) => moveCommandMock.Object).Execute();
             Ioc.Resolve<App.ICommand>("IoC.Register", "Collision.GetNearbyObjects", (object[] args) => emptyObjects).Execute();
+            Ioc.Resolve<App.ICommand>("IoC.Register", "Collision.Check", (object[] args) => collisionCheckMock.Object).Execute();
 
-            var command = new MoveWithCollisionCommand(movingMock.Object);
-
+            var command = new CollisionCommandWithGrid(movingMock.Object);
             command.Execute();
 
-            moveCommandMock.Verify(cmd => cmd.Execute());
+            collisionCheckMock.Verify(cmd => cmd.Execute(), Times.Never);
         }
+
 
         [Fact]
         public void Execute_WithNearbyObjects_CollisionCheckForEach()
         {
             var movingMock = new Mock<IMoving>();
-            var moveCommandMock = new Mock<ICommand>();
             var collisionCheckMock = new Mock<ICommand>();
             var nearbyObjects = new List<object> { new object(), new object() };
 
-            Ioc.Resolve<App.ICommand>("IoC.Register", "Commands.Move", (object[] args) => moveCommandMock.Object).Execute();
             Ioc.Resolve<App.ICommand>("IoC.Register", "Collision.GetNearbyObjects", (object[] args) => nearbyObjects).Execute();
             Ioc.Resolve<App.ICommand>("IoC.Register", "Collision.Check", (object[] args) => collisionCheckMock.Object).Execute();
 
-            var command = new MoveWithCollisionCommand(movingMock.Object);
-
+            var command = new CollisionCommandWithGrid(movingMock.Object);
             command.Execute();
 
-            moveCommandMock.Verify(cmd => cmd.Execute());
             collisionCheckMock.Verify(cmd => cmd.Execute(), Times.Exactly(2));
         }
 
         [Fact]
         public void Execute_RegistersCommandWithCorrectFactory()
         {
-            var registerCommand = new RegisterMoveWithCollision();
+            var registerCommand = new RegisterCollisionCommandWithGrid();
             var mockMoving = new Mock<IMoving>().Object;
 
             registerCommand.Execute();
 
-            var command = Ioc.Resolve<ICommand>("Movement.WithCollision", mockMoving);
+            var command = Ioc.Resolve<ICommand>("Collision.WithGrid", mockMoving);
             Assert.NotNull(command);
+
+            
         }
     }
 }
