@@ -33,7 +33,6 @@ namespace SpaceBattle.Lib.Tests
             collisionCheckMock.Verify(cmd => cmd.Execute(), Times.Never);
         }
 
-
         [Fact]
         public void Execute_WithNearbyObjects_CollisionCheckForEach()
         {
@@ -61,7 +60,6 @@ namespace SpaceBattle.Lib.Tests
             var command = Ioc.Resolve<ICommand>("Collision.WithGrid", mockMoving);
             Assert.NotNull(command);
 
-            
         }
     }
 }
