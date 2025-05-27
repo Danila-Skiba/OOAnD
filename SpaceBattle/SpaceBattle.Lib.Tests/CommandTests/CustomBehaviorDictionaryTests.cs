@@ -1,4 +1,4 @@
-using System.Collections;
+﻿using System.Collections;
 
 namespace SpaceBattle.Tests
 {
@@ -215,7 +215,6 @@ namespace SpaceBattle.Tests
             var wrapper = new CustomBehaviorDictionary(new Dictionary<string, object>(), new Dictionary<string, Func<object>>());
             var item = new KeyValuePair<string, object>("missing", "value");
 
-
             Assert.DoesNotContain(item, wrapper);
         }
 
@@ -228,9 +227,7 @@ namespace SpaceBattle.Tests
                 new Dictionary<string, Func<object>>());
             var item = new KeyValuePair<string, object>("nonexistent", "value");
 
-
             var result = wrapper.Contains(item);
-
 
             Assert.False(result);
         }
