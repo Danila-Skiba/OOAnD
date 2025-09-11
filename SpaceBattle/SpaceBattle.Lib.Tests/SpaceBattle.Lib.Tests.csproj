@@ -18,6 +18,7 @@
       <PrivateAssets>all</PrivateAssets>
     </PackageReference>
     <ProjectReference Include="..\SpaceBattle.Lib\SpaceBattle.Lib.csproj" />
+    <PackageReference Include="Scriban" Version="5.0.0" />
 
     <Reference Include="core">
       <HintPath>..\Common\core.dll</HintPath>
